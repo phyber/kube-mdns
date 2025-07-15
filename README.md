@@ -4,7 +4,8 @@ Kube mDNS registers hostnames with Avahi based on annotations given to an
 `Ingress`. This allows Ingresses to have unique `.local` hostnames assigned to
 them, which helps with reverse proxying.
 
-This project is based on [`docker-mdns`].
+This project is based on [`docker-mdns`], which provides the same functionality
+for Docker environments.
 
 ## Minimum Supported Rust Version (MSRV)
 
