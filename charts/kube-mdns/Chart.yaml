@@ -1,0 +1,16 @@
+---
+apiVersion: "v2"
+appVersion: "0.1.0"
+description: "mDNS controller for Kubernetes"
+home: "https://github.com/phyber/kube-mdns"
+keywords:
+  - "ingress"
+  - "mdns"
+kubeVersion: ">=1.32.0-0"
+maintainers:
+  - name: "phyber"
+name: "kube-mdns"
+sources:
+  - "https://github.com/phyber/kube-mdns"
+type: "application"
+version: "0.4.0"

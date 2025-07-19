@@ -36,8 +36,8 @@ of the `LoadBalancer` that ends up attached to the `Ingress` object.
 
 ```yaml
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: "networking.k8s.io/v1"
+kind: "Ingress"
 metadata:
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
@@ -57,6 +57,22 @@ spec:
                 port:
                   name: "example"
 ```
+
+## Known Issues
+
+These are mostly issues just because they're untested with my current setup.
+
+  - This is currently developed in a Kubernetes "cluster" with just a single
+    node
+  - With >1 node in a cluster, how do we decide which node to announce mDNS
+    from? Do we need to decide at all?
+    - RFC-6762 section 6.6 suggests it should be fine to announce all
+      configured names from each node
+      - Specifically the second case given, where duplicate mDNS responses
+        contain the same rrtype, rrclass, and rdata
+  - The container image is not currently a multi-arch image, making use of the
+    Helm charts a little more difficult as users must manually specify which
+    image tag they'd like to use
 
 ## License
 

@@ -1,0 +1,51 @@
+---
+apiVersion: "apps/v1"
+kind: "DaemonSet"
+metadata:
+  name: {{ include "kube-mdns.fullname" . | quote }}
+  namespace: {{ include "kube-mdns.namespace" . | quote }}
+  labels:
+    {{- include "kube-mdns.labels" . | nindent 4 }}
+    app.kubernetes.io/component: "controller"
+spec:
+  selector:
+    matchLabels:
+      {{- include "kube-mdns.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- if .Values.podAnnotations }}
+      annotations:
+        {{- range $key, $value := .Values.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+      {{- end }}
+      labels:
+        {{- include "kube-mdns.labels" . | nindent 8 }}
+        {{- if .Values.podLabels }}
+        {{- range $key, $value := .Values.podLabels }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+        {{- end }}
+        app.kubernetes.io/component: "controller"
+    spec:
+      automountServiceAccountToken: {{ .Values.serviceAccount.automount }}
+      serviceAccountName: {{ include "kube-mdns.serviceAccountName" . | quote }}
+      containers:
+        - name: {{ include "kube-mdns.fullname" . | quote }}
+          image: {{ include "kube-mdns.image" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          {{- if .Values.podEnvironment }}
+          env:
+            {{- range $key, $value := .Values.podEnvironment }}
+            - name: {{ $key | quote }}
+              value: {{ $value | quote }}
+            {{- end }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: "/run/dbus"
+              name: "host-run-dbus"
+      volumes:
+        - name: "host-run-dbus"
+          hostPath:
+            path: "/run/dbus"
+            type: "Directory"
