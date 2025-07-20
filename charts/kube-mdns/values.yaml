@@ -24,6 +24,12 @@ security:
   networkPolicy:
     enabled: false
 
+# Path and port are currently static within kube-mdns and cannot be
+# reconfigured. Changing those values will break the liveness check.
+livenessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
 # This section builds out the service account more information can be found
 # here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:

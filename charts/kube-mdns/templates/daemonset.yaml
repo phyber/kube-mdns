@@ -41,6 +41,12 @@ spec:
               value: {{ $value | quote }}
             {{- end }}
           {{- end }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            httpGet:
+              path: "/healthz"
+              port: 8080
           volumeMounts:
             - mountPath: "/run/dbus"
               name: "host-run-dbus"
