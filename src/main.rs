@@ -29,6 +29,7 @@ use tracing_subscriber::filter::{
 };
 
 mod bus;
+mod httpd;
 
 // The annotation we look for to take our hostnames from. This should be a
 // space separated list.
@@ -225,10 +226,15 @@ async fn main() -> Result<(), Error> {
         dbus,
     }));
 
-    Controller::new(ingresses, watcher::Config::default())
+    let controller = Controller::new(ingresses, watcher::Config::default())
+        .shutdown_on_signal()
         .run(reconcile, error_policy, context)
-        .for_each(|_| futures::future::ready(()))
-        .await;
+        .for_each(|_| futures::future::ready(()));
+
+    // HTTPd handles heath checking
+    let health_checks = httpd::Server::run();
+
+    tokio::join!(controller, health_checks);
 
     Ok(())
 }
