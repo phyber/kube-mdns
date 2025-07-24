@@ -1,0 +1,4 @@
+# vim:ft=dockerfile:
+FROM debian:bookworm-20250721-slim
+COPY kube-mdns /usr/local/bin/kube-mdns
+ENTRYPOINT ["/usr/local/bin/kube-mdns"]
