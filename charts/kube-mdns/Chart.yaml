@@ -1,6 +1,6 @@
 ---
 apiVersion: "v2"
-appVersion: "0.1.0"
+appVersion: "0.1.1"
 description: "mDNS controller for Kubernetes"
 home: "https://github.com/phyber/kube-mdns"
 keywords:
@@ -13,4 +13,4 @@ name: "kube-mdns"
 sources:
   - "https://github.com/phyber/kube-mdns"
 type: "application"
-version: "0.4.0"
+version: "0.4.1"
