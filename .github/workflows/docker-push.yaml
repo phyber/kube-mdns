@@ -5,6 +5,10 @@ on:
   push:
     branches:
       - "main"
+    paths-ignore:
+      # Any path changing that isn't charts/** should be a change related to
+      # the application.
+      - "charts/**"
     tags:
       - "v*"
 
