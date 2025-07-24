@@ -22,6 +22,7 @@ async fn healthz() -> (StatusCode, &'static str) {
 }
 
 // Handle graceful shutdown via ctrl+c or SIGTERM.
+#[allow(clippy::ignored_unit_patterns)]
 async fn shutdown_signal() {
     let ctrl_c = async {
         signal::ctrl_c()
