@@ -2,6 +2,25 @@ apiVersion: v1
 entries:
   kube-mdns:
   - apiVersion: v2
+    appVersion: 0.1.1
+    created: "2025-07-24T23:00:15.705015767Z"
+    description: mDNS controller for Kubernetes
+    digest: 8222fe5821886d8c79f7784a362436d87c080872b5dbf7dc8616e5e004768a4f
+    home: https://github.com/phyber/kube-mdns
+    keywords:
+    - ingress
+    - mdns
+    kubeVersion: '>=1.32.0-0'
+    maintainers:
+    - name: phyber
+    name: kube-mdns
+    sources:
+    - https://github.com/phyber/kube-mdns
+    type: application
+    urls:
+    - https://github.com/phyber/kube-mdns/releases/download/kube-mdns-0.4.1/kube-mdns-0.4.1.tgz
+    version: 0.4.1
+  - apiVersion: v2
     appVersion: 0.1.0
     created: "2025-07-24T19:55:57.989202258Z"
     description: mDNS controller for Kubernetes
@@ -20,4 +39,4 @@ entries:
     urls:
     - https://github.com/phyber/kube-mdns/releases/download/kube-mdns-0.4.0/kube-mdns-0.4.0.tgz
     version: 0.4.0
-generated: "2025-07-24T19:55:57.989206555Z"
+generated: "2025-07-24T23:00:15.705024162Z"
