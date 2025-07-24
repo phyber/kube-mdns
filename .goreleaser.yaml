@@ -1,29 +1,19 @@
 ---
-# This is an example .goreleaser.yml file with some sensible defaults.
-# Make sure to check the documentation at https://goreleaser.com
-
-# The lines below are called `modelines`. See `:help modeline`
-# Feel free to remove those if you don't want/need to use them.
-# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
-# vim: set ts=2 sw=2 tw=0 fo=cnqoj
-
 version: 2
 
 before:
   hooks:
-    # if you don't do these things before calling goreleaser, it might be a
-    # good idea to do them here:
-    - rustup default stable
-    - cargo install --locked cargo-zigbuild
-    - cargo fetch --locked
+    - "rustup default stable"
+    - "cargo install --locked cargo-zigbuild"
+    - "cargo fetch --locked"
 
 builds:
-  - builder: rust
+  - builder: "rust"
     flags:
-      - --release
+      - "--release"
     targets:
-      - aarch64-unknown-linux-gnu
-      - x86_64-unknown-linux-gnu
+      - "aarch64-unknown-linux-gnu"
+      - "x86_64-unknown-linux-gnu"
 
 # Build container images
 dockers:
@@ -33,8 +23,11 @@ dockers:
     use: "buildx"
     build_flag_templates:
       - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.documentation=https://github.com/phyber/kube-mdns"
       - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.source=https://github.com/phyber/kube-mdns"
       - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.url=https://github.com/phyber/kube-mdns"
       - "--label=org.opencontainers.image.version={{ .Version }}"
       - "--platform=linux/amd64"
     image_templates:
@@ -45,8 +38,11 @@ dockers:
     use: "buildx"
     build_flag_templates:
       - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.documentation=https://github.com/phyber/kube-mdns"
       - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.source=https://github.com/phyber/kube-mdns"
       - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.url=https://github.com/phyber/kube-mdns"
       - "--label=org.opencontainers.image.version={{ .Version }}"
       - "--platform=linux/arm64"
     image_templates:
@@ -54,6 +50,10 @@ dockers:
 
 docker_manifests:
   - name_template: "ghcr.io/phyber/kube-mdns:{{ .Tag }}"
+    image_templates:
+      - "ghcr.io/phyber/kube-mdns:{{ .Tag }}-amd64"
+      - "ghcr.io/phyber/kube-mdns:{{ .Tag }}-arm64"
+  - name_template: "ghcr.io/phyber/kube-mdns:latest"
     image_templates:
       - "ghcr.io/phyber/kube-mdns:{{ .Tag }}-amd64"
       - "ghcr.io/phyber/kube-mdns:{{ .Tag }}-arm64"
@@ -71,7 +71,7 @@ archives:
       {{- else }}{{ .Arch }}{{ end }}
 
 changelog:
-  sort: asc
+  sort: "asc"
   filters:
     exclude:
       - "^docs:"
@@ -83,4 +83,3 @@ release:
     ---
 
     Released by [GoReleaser](https://github.com/goreleaser/goreleaser).
-

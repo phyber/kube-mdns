@@ -3,11 +3,6 @@ name: "GoReleaser"
 
 on:
   push:
-    branches:
-      - "main"
-    paths-ignore:
-      - ".github/**"
-      - "charts/**"
     tags:
       - "v*"
   workflow_dispatch: {}
