@@ -1,48 +1,38 @@
 ---
-name: "Docker Push"
+name: "GoReleaser"
 
 on:
   push:
     branches:
       - "main"
     paths-ignore:
-      # Any path changing that isn't charts/** should be a change related to
-      # the application.
+      - ".github/**"
       - "charts/**"
     tags:
       - "v*"
+  workflow_dispatch: {}
+
+permissions:
+  contents: "write"  # Create a release
+  packages: "write"  # Publish packages
 
 jobs:
-  push:
-    name: "Docker Push"
+  goreleaser:
     runs-on: "ubuntu-latest"
-    permissions:
-      packages: "write"
-      contents: "read"
-    strategy:
-      matrix:
-        target:
-          - "aarch64-unknown-linux-gnu"
-          - "armv7-unknown-linux-gnueabihf"
-          - "x86_64-unknown-linux-gnu"
-
     steps:
       - name: "Checkout"
         uses: "actions/checkout@v4"
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
-      - name: "Target Cache"
-        uses: "actions/cache@v4"
-        with:
-          key: "stable-${{ runner.os }}-${{ matrix.target }}-${{ hashFiles('Cargo.lock') }}"
-          path: "target"
+      - name: "Setup Zig"
+        uses: "mlugg/setup-zig@v2"
 
-      - name: "Install Rust Toolchain"
-        uses: "dtolnay/rust-toolchain@v1"
-        with:
-          targets: "${{ matrix.target }}"
-          toolchain: "stable"
+      - name: "Setup QEMU"
+        uses: "docker/setup-qemu-action@v3"
+
+      - name: "Setup Docker buildx"
+        uses: "docker/setup-buildx-action@v3"
 
       # Login to DockerHub to help with throttling of image pulls. This token
       # is Read-Only.
@@ -52,35 +42,6 @@ jobs:
           password: "${{ secrets.DOCKER_HUB_TOKEN }}"
           username: "${{ secrets.DOCKER_HUB_USERNAME }}"
 
-      - name: "Build"
-        uses: "actions-rs/cargo@v1"
-        with:
-          command: "build"
-          use-cross: true
-          args: >-
-            --release
-            --target ${{ matrix.target }}
-
-      - name: "Create Image"
-        id: "image"
-        env:
-          IMAGE_NAME: "kube-mdns"
-        run: |
-          ARCH_NAME="$(echo "${{ matrix.target }}" | cut -d"-" -f1)"
-
-          # Fix up the arch name if we're on an x86_64 target.
-          if [ "${ARCH_NAME}" == "x86_64" ]; then
-            ARCH_NAME="amd64"
-          fi
-
-          # This should just build the image right away, cross has already
-          # built our binary above.
-          make image${ARCH_NAME}
-
-          echo "arch_name=${ARCH_NAME}" >> "${GITHUB_OUTPUT}"
-          echo "base_image_name=${IMAGE_NAME}" >> "${GITHUB_OUTPUT}"
-          echo "image_name=${IMAGE_NAME}:${ARCH_NAME}" >> "${GITHUB_OUTPUT}"
-
       # Login for pushing the image to GitHub.
       - name: "GitHub Registry Login"
         uses: "docker/login-action@v3"
@@ -89,32 +50,11 @@ jobs:
           registry: "ghcr.io"
           username: "${{ github.actor }}"
 
-      - name: "Push Image"
-        run: |
-          ARCH_NAME="${{ steps.image.outputs.arch_name }}"
-          BASE_IMAGE_NAME="${{ steps.image.outputs.base_image_name }}"
-          IMAGE_NAME="${{ steps.image.outputs.image_name }}"
-          IMAGE_ID="ghcr.io/${{ github.repository_owner }}/${BASE_IMAGE_NAME}"
-          IMAGE_ID="$(echo ${IMAGE_ID} | tr '[A-Z]' '[a-z]')"
-          VERSION="$(echo "${{ github.ref }}" | sed 's#.*/\(.*\)#\1#')"
-
-          if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
-            VERSION="${ARCH_NAME}-$(echo "${VERSION}" | sed -e 's/^v//')"
-          fi
-
-          if [ "${VERSION}" == "main" ]; then
-            VERSION="${ARCH_NAME}-latest"
-          fi
-
-          echo IMAGE_ID="${IMAGE_ID}"
-          echo VERSION="${VERSION}"
-
-          # Tag
-          echo "Tagging"
-          docker tag "${IMAGE_NAME}" "${IMAGE_ID}:${ARCH_NAME}"
-          docker tag "${IMAGE_NAME}" "${IMAGE_ID}:${VERSION}"
-
-          # Push
-          echo "Pushing"
-          docker push "${IMAGE_ID}:${ARCH_NAME}"
-          docker push "${IMAGE_ID}:${VERSION}"
+      - name: "GoReleaser"
+        uses: "goreleaser/goreleaser-action@v6"
+        with:
+          args: "release --clean"
+          distribution: "goreleaser"
+          version: "~> 2"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
