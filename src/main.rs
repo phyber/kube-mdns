@@ -163,6 +163,19 @@ async fn reconcile(
         return Ok(Action::await_change());
     };
 
+    // Grab the Dbus client
+    let dbus = &mut context
+        .lock()
+        .await
+        .dbus;
+
+    // We unpublish at this point because the Ingress object could be
+    // being removed.
+    // Unpublish any existing records
+    dbus
+        .unpublish(uid)
+        .await?;
+
     let Some(hostnames) = ingress_hostnames(&ingress) else {
         info!("{namespaced_ingress}: no hostnames found, skipping");
 
@@ -179,17 +192,6 @@ async fn reconcile(
     };
 
     info!("{namespaced_ingress}: found load balancer IP addresses: {ip_addresses:?}");
-
-    // Grab the Dbus client
-    let dbus = &mut context
-        .lock()
-        .await
-        .dbus;
-
-    // Unpublish any existing records
-    dbus
-        .unpublish(uid)
-        .await?;
 
     // If there are no new records to publish, we can stop here
     if hostnames.is_empty() || ip_addresses.is_empty() {
