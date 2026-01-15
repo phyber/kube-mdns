@@ -5,7 +5,9 @@ ECHO := echo
 PROJECT := kube-mdns
 
 # The version of Debian used in the final generated images
-DOCKER_BASE_IMAGE := debian:bookworm-20250630-slim
+DEBIAN_RELEASE := trixie
+IMAGE_DATE := 20260112
+DOCKER_BASE_IMAGE := debian:$(DEBIAN_RELEASE)-$(IMAGE_DATE)-slim
 DOCKERFILE := docker/Dockerfile
 
 # AARCH64

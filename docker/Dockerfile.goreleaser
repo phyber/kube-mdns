@@ -1,4 +1,4 @@
 # vim:ft=dockerfile:
-FROM debian:trixie-20250908-slim
+FROM debian:trixie-20260112-slim
 COPY kube-mdns /usr/local/bin/kube-mdns
 ENTRYPOINT ["/usr/local/bin/kube-mdns"]
